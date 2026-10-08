@@ -1,0 +1,39 @@
+# Pinned inference stack for RunPod (CUDA 12.x driver, Python 3.10).
+# torch/torchvision are installed first from the cu121 index by setup_runpod.sh;
+# they are listed here so pip never replaces them while resolving the rest.
+torch==2.1.2
+torchvision==0.16.2
+
+# Core model stack (matches pyproject.toml)
+transformers==4.37.2
+tokenizers==0.15.1
+sentencepiece==0.1.99
+accelerate==0.21.0
+peft==0.8.2
+bitsandbytes==0.43.1
+einops==0.6.1
+einops-exts==0.0.4
+timm==0.6.13
+scikit-learn==1.2.2
+# torch 2.1.2 and scikit-learn 1.2.2 are built against NumPy 1.x
+numpy==1.26.4
+shortuuid
+markdown2[all]
+shapely
+requests
+openai==0.28
+
+# Hugging Face Hub (<1.0 is required by transformers 4.37.2) + fast downloads
+huggingface_hub==0.25.2
+hf_transfer>=0.1.8
+
+# Web demo: llava/serve/gradio_web_server.py uses the Gradio 3.x API
+# (gr.Button.update, gr.Image(tool="color-sketch"), queue(concurrency_count=...), _js=...)
+gradio==3.35.2
+gradio_client==0.2.9
+pydantic==1.10.13
+fastapi==0.104.1
+uvicorn==0.24.0
+httpx==0.24.0
+websockets==11.0.3
+python-multipart==0.0.9

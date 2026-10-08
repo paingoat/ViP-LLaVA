@@ -13,6 +13,9 @@ dist
 # Data
 !**/alpaca-data-conversation.json
 
+# Secrets
+.env
+
 # Editor
 .idea
 *.swp

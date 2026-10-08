@@ -27,3 +27,7 @@
 
 # Jupyter notebook
 *.ipynb  text eol=lf
+
+# Shell scripts / env files must keep LF to run on Linux
+*.sh     text eol=lf
+.env*    text eol=lf
