@@ -98,7 +98,7 @@ bash runpod/run_exp1.sh --limit 1 --no-push   # smoke test 1 run, không commit
 bash runpod/run_exp1.sh                       # 15 run (5 ảnh x 3 prompt), commit + push batch folder
 ```
 
-Sau đó chạy `git pull` ở máy local để lấy batch folder. Script sẽ tắt demo Gradio để giải phóng VRAM; bật lại bằng `bash runpod/start_demo.sh`. Các tham số thêm của `test/exp1/run_exp1.py` (truyền qua `run_exp1.sh`): `--layers 10-29`, `--topk-heads 3`, `--candidate-frac 0.2`, `--sink-tau 20`, `--max-new-tokens 512`, `--tz-offset 7`.
+Sau đó chạy `git pull` ở máy local để lấy batch folder. Script sẽ tắt demo Gradio để giải phóng VRAM; bật lại bằng `bash runpod/start_gradio.sh --detach`. Các tham số thêm của `test/exp1/run_exp1.py` (truyền qua `run_exp1.sh`): `--layers 10-29`, `--topk-heads 3`, `--candidate-frac 0.2`, `--sink-tau 20`, `--max-new-tokens 512`, `--tz-offset 7`.
 
 ## 7. Xử lý sự cố
 
