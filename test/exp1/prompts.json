@@ -1,0 +1,17 @@
+[
+  {
+    "id": "p1_source_recognition",
+    "name": "Source Object Recognition",
+    "text": "What is the object enclosed by the red circle?"
+  },
+  {
+    "id": "p2_target_location",
+    "name": "Target Location Understanding",
+    "text": "Describe the location indicated by the tip of the red arrow relative to nearby objects."
+  },
+  {
+    "id": "p3_compositional_reasoning",
+    "name": "Compositional Spatial Reasoning",
+    "text": "If the object enclosed by the red circle were moved to the tip of the red arrow, describe its new location relative to nearby objects."
+  }
+]

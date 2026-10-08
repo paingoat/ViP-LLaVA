@@ -22,6 +22,8 @@ markdown2[all]
 shapely
 requests
 openai==0.28
+# Figures for attention-map experiments (test/exp1); 3.8.x supports NumPy 1.26
+matplotlib==3.8.4
 
 # Hugging Face Hub (<1.0 is required by transformers 4.37.2) + fast downloads
 huggingface_hub==0.25.2

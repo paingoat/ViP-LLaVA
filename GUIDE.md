@@ -58,7 +58,40 @@ bash runpod/start_demo.sh stop     # dừng
 2. Gõ câu hỏi, ví dụ "What is the object within the red circle?", rồi bấm **Send**.
 3. Khi đổi sang ảnh mới, bấm **Clear** trước.
 
-## 6. Xử lý sự cố
+## 6. Thí nghiệm exp1: deictic visual cue + attention map
+
+Mỗi ảnh trong `test/exp1/input` (đã overlay sẵn vòng khoanh + mũi tên) được ghép với từng prompt trong `test/exp1/prompts.json`. Mỗi cặp là 1 run độc lập (hội thoại mới, greedy decoding). Kết quả nằm trong `test/exp1/output/YYYY-MM-DD_HH-mm-ss/` (giờ UTC+7), mỗi run gồm 2 file:
+
+- `<ảnh>__<prompt_id>.png`: ảnh gốc + 3 attention map (dấu `x` trắng là đỉnh của map), câu trả lời làm caption.
+- `<ảnh>__<prompt_id>.json`: cấu hình chạy (prompt, model, decoding, layer band, sink token, head được chọn, toạ độ đỉnh, phiên bản thư viện, git commit).
+
+Ba attention map (đều không cần huấn luyện, code ở `llava/eval/attention_maps.py`):
+
+| Panel | Phương pháp | Query |
+| --- | --- | --- |
+| Answer-token attention | Trung bình attention lên image token qua các layer giữa và mọi head (LVLM-Interpret, CVPR'24 W) | Các vị trí sinh ra từng token câu trả lời |
+| Relative attention | Attention với prompt thí nghiệm chia cho attention với prompt chung "Write a general description of the image." (ICLR'25 "MLLMs Know Where to Look") | Token cuối của input |
+| Localization heads | Top-k head có spatial entropy thấp nhất trong nhóm head chú ý nhiều nhất vào ảnh (CVPR'25 "Only Needs A Few Attention Heads") | Token cuối của input |
+
+Mọi map đều bỏ các visual sink token (ICLR'25 "See What You Are Told"), cắt phần padding của `expand2square` rồi upsample về kích thước ảnh gốc.
+
+Cách chạy (toàn bộ trên pod):
+
+```bash
+# Local: commit code + ảnh input, push branch attention
+# Trên pod:
+cd /workspace/ViP-LLaVA
+git fetch && git checkout attention
+git config --global user.name "<tên>" && git config --global user.email "<email>"
+# git push cần GitHub Personal Access Token (dùng làm password, hoặc: git config --global credential.helper store)
+
+bash runpod/run_exp1.sh --limit 1 --no-push   # smoke test 1 run, không commit
+bash runpod/run_exp1.sh                       # 15 run (5 ảnh x 3 prompt), commit + push batch folder
+```
+
+Sau đó chạy `git pull` ở máy local để lấy batch folder. Script sẽ tắt demo Gradio để giải phóng VRAM; bật lại bằng `bash runpod/start_demo.sh`. Các tham số thêm của `test/exp1/run_exp1.py` (truyền qua `run_exp1.sh`): `--layers 10-29`, `--topk-heads 3`, `--candidate-frac 0.2`, `--sink-tau 20`, `--max-new-tokens 512`, `--tz-offset 7`.
+
+## 7. Xử lý sự cố
 
 | Triệu chứng | Cách xử lý |
 | --- | --- |
@@ -67,7 +100,7 @@ bash runpod/start_demo.sh stop     # dừng
 | Hết VRAM | Đặt `LOAD_MODE=8bit` hoặc bớt model trong `MODEL_PATHS` |
 | Lỗi khi cài lại thư viện | `conda env remove -n vip-llava` rồi chạy lại `bash setup_runpod.sh` |
 
-## 7. Ghi chú về phiên bản thư viện
+## 8. Ghi chú về phiên bản thư viện
 
 - `gradio==3.35.2` (không phải 4.16.0 như trong `pyproject.toml` gốc): `llava/serve/gradio_web_server.py` dùng API của Gradio 3.x (`gr.Button.update`, `tool="color-sketch"`, `concurrency_count`). Vì vậy phải pin kèm `pydantic<2`, `fastapi==0.104.1`, `websockets==11.0.3`.
 - `numpy==1.26.4`: torch 2.1.2 và scikit-learn 1.2.2 không chạy được với NumPy 2.

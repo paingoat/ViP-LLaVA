@@ -44,3 +44,9 @@ dataset
 *chtc*
 *debug*
 llava/model/language_model/mpt_old
+
+.cursor/
+
+# Experiments: keep prompts and batch results under version control
+!test/exp1/output
+!test/exp1/**/*.json
