@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# Start (or restart) controller + model worker(s) + Gradio web UI in the background.
-# Usage: bash runpod/start_demo.sh         start / restart everything
-#        bash runpod/start_demo.sh stop    stop everything
+# Start (or restart) controller + model worker(s) + Gradio web UI.
+# Usage: bash runpod/start_gradio.sh           start everything, then follow the logs (Ctrl+C stops everything)
+#        bash runpod/start_gradio.sh --detach  start everything in the background and exit
+#        bash runpod/start_gradio.sh logs      follow the logs of the running services (Ctrl+C keeps them running)
+#        bash runpod/start_gradio.sh stop      stop everything
 set -eo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
@@ -18,6 +20,32 @@ if [[ "${1:-}" == "stop" ]]; then
     echo "All ViP-LLaVA services stopped."
     exit 0
 fi
+
+# Background jobs started from this non-interactive script ignore SIGINT, so in
+# "logs" mode Ctrl+C only ends the log view; the trap that stops the servers is
+# registered only in the default foreground mode below.
+follow_logs() {  # follow_logs <stop-servers: 0|1>
+    trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
+    if [[ "$1" == "1" ]]; then
+        trap 'kill $(jobs -p) 2>/dev/null || true; stop_all; exit 0' INT TERM
+        echo "Following logs. Ctrl+C stops the controller, workers and Gradio."
+    else
+        echo "Following logs. Ctrl+C only stops this view; the servers keep running."
+    fi
+    # gradio.out carries every user interaction: load_demo, add_text, http_bot,
+    # the request (prompt + params) and the model's answer.
+    tail -n +1 -F gradio.out &
+    # worker_*.out is mostly heartbeats; keep only errors.
+    tail -n 0 -F worker_*.out 2>/dev/null | grep --line-buffered -E "ERROR|Traceback" &
+    wait
+}
+
+if [[ "${1:-}" == "logs" ]]; then
+    cd "$LOG_DIR"
+    [[ -f gradio.out ]] || { echo "No running demo found in $LOG_DIR. Run: bash $REPO_DIR/runpod/start_gradio.sh" >&2; exit 1; }
+    follow_logs 0
+fi
+
 stop_all
 
 case "$LOAD_MODE" in
@@ -124,5 +152,12 @@ if [[ -n "${RUNPOD_POD_ID:-}" ]]; then
     echo "RunPod proxy : https://${RUNPOD_POD_ID}-${GRADIO_PORT}.proxy.runpod.net   (needs HTTP port $GRADIO_PORT exposed on the pod)"
 fi
 echo "Logs         : $LOG_DIR/{controller,worker_*,gradio}.out"
-echo "Stop         : bash $REPO_DIR/runpod/start_demo.sh stop"
+echo "Stop         : bash $REPO_DIR/runpod/start_gradio.sh stop"
 echo "============================================================"
+
+if [[ "${1:-}" == "--detach" ]]; then
+    echo "Running in the background. View logs with: bash $REPO_DIR/runpod/start_gradio.sh logs"
+    exit 0
+fi
+
+follow_logs 1

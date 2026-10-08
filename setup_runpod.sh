@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
-# One-shot ViP-LLaVA setup on RunPod: Miniconda -> conda env + libs -> HF weights (hf_transfer) -> Gradio demo.
-# Usage: bash setup_runpod.sh [--skip-install] [--skip-download] [--no-launch]
+# One-shot ViP-LLaVA setup on RunPod: Miniconda -> conda env + libs -> HF weights (hf_transfer).
+# Usage: bash setup_runpod.sh [--skip-install] [--skip-download]
 set -eo pipefail
 
 SKIP_INSTALL=0
 SKIP_DOWNLOAD=0
-LAUNCH=1
 for arg in "$@"; do
     case "$arg" in
         --skip-install) SKIP_INSTALL=1 ;;
         --skip-download) SKIP_DOWNLOAD=1 ;;
-        --no-launch) LAUNCH=0 ;;
         -h|--help) sed -n '2,3p' "$0"; exit 0 ;;
         *) echo "Unknown option: $arg" >&2; exit 1 ;;
     esac
@@ -55,6 +53,10 @@ if [[ $SKIP_INSTALL -eq 0 ]]; then
     fi
     conda activate "$CONDA_ENV_NAME"
 
+    # Auto-activate the env in new terminals (~/.bashrc lives on the container disk, re-added each setup).
+    activate_line="source $CONDA_DIR/etc/profile.d/conda.sh && conda activate $CONDA_ENV_NAME"
+    grep -qxF "$activate_line" ~/.bashrc 2>/dev/null || echo "$activate_line" >> ~/.bashrc
+
     # ---------- 3. Python packages ----------
     log "Installing PyTorch 2.1.2 (cu121 wheels run on the CUDA 12.8 driver)"
     python -m pip install --upgrade pip
@@ -69,6 +71,7 @@ if [[ $SKIP_INSTALL -eq 0 ]]; then
     log "Sanity check"
     python - <<'PY'
 import torch, transformers, gradio, numpy
+import google.protobuf  # noqa: F401
 # llava/model/__init__.py silently swallows import errors, so import the class directly.
 from llava.model.language_model.llava_llama import LlavaLlamaForCausalLM  # noqa: F401
 print(f"torch {torch.__version__} (CUDA {torch.version.cuda}) | transformers {transformers.__version__} "
@@ -76,10 +79,6 @@ print(f"torch {torch.__version__} (CUDA {torch.version.cuda}) | transformers {tr
 assert torch.cuda.is_available(), "CUDA is not available to PyTorch"
 print("GPU:", torch.cuda.get_device_name(0))
 PY
-
-    # Auto-activate the env in new terminals (~/.bashrc lives on the container disk, re-added each setup).
-    activate_line="source $CONDA_DIR/etc/profile.d/conda.sh && conda activate $CONDA_ENV_NAME"
-    grep -qxF "$activate_line" ~/.bashrc 2>/dev/null || echo "$activate_line" >> ~/.bashrc
 else
     activate_conda
 fi
@@ -90,9 +89,4 @@ if [[ $SKIP_DOWNLOAD -eq 0 ]]; then
     python runpod/download_weights.py
 fi
 
-# ---------- 5. Demo ----------
-if [[ $LAUNCH -eq 1 ]]; then
-    bash runpod/start_demo.sh
-else
-    log "Setup done. Start the demo with: bash runpod/start_demo.sh"
-fi
+log "Setup done. Start the demo with: bash runpod/start_gradio.sh"

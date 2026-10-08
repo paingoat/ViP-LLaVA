@@ -29,16 +29,25 @@ bash setup_runpod.sh
 1. Cài Miniconda vào `/workspace/miniconda3`.
 2. Tạo env `vip-llava` (Python 3.10), cài PyTorch 2.1.2 (cu121) và các thư viện đã pin trong `runpod/requirements.txt`, rồi `pip install -e .`.
 3. Tạo `/workspace/data/{huggingface,logs}` và tải trọng số bằng `hf_transfer` vào `/workspace/data/huggingface`: `mucai/vip-llava-13b` (~26GB) và `openai/clip-vit-large-patch14-336` (~1.7GB).
-4. Khởi động controller, model worker và Gradio, rồi in ra **Public link** (`https://xxxx.gradio.live`).
 
-Các tuỳ chọn: `--skip-install`, `--skip-download`, `--no-launch`.
+Các tuỳ chọn: `--skip-install`, `--skip-download`.
+
+Chạy demo sau khi setup xong:
+
+```bash
+bash runpod/start_gradio.sh
+```
+
+Script khởi động controller, model worker và Gradio, in ra **Public link** (`https://xxxx.gradio.live`), rồi hiển thị log ở foreground: mỗi lần người dùng tương tác (gửi câu hỏi, câu trả lời của model, regenerate, clear, vote) đều in ra terminal. Bấm **Ctrl+C** để dừng toàn bộ server.
 
 ## 3. Sau khi restart pod
 
 ```bash
 cd /workspace/ViP-LLaVA
-bash runpod/start_demo.sh          # start/restart toàn bộ demo
-bash runpod/start_demo.sh stop     # dừng
+bash runpod/start_gradio.sh            # start/restart demo, rồi hiện log (Ctrl+C dừng server)
+bash runpod/start_gradio.sh --detach   # chạy nền, terminal được trả lại
+bash runpod/start_gradio.sh logs       # xem log của server đang chạy (Ctrl+C chỉ thoát xem log)
+bash runpod/start_gradio.sh stop       # dừng
 ```
 
 ## 4. Cấu hình `.env`
