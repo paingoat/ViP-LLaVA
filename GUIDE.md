@@ -121,5 +121,6 @@ Sau đó chạy `git pull` ở máy local để lấy batch folder. Script sẽ 
 - `huggingface_hub==0.25.2`: transformers 4.37.2 yêu cầu `<1.0`; phiên bản này tải qua `hf_transfer` khi `HF_HUB_ENABLE_HF_TRANSFER=1`.
 - `setuptools<81`: Gradio 3.35.2 import `pkg_resources`. Từ setuptools 81 module này không còn.
 - `protobuf==4.25.3`: `LlamaTokenizer` của transformers 4.37.2 cần protobuf để đọc file tokenizer.
+- `matplotlib==3.8.4`: vẽ attention map của exp1; bản 3.8 chạy với NumPy 1.26.
 - Demo Gradio chỉ hỗ trợ các checkpoint dùng Vicuna (`vip-llava-7b`, `vip-llava-13b`, `*-base`). Các bản Llama-3/Phi-3 cần template hội thoại khác.
 - Không cài `flash-attn`/`deepspeed` vì chỉ cần cho training.

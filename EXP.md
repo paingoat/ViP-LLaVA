@@ -16,7 +16,7 @@ Với 5 ảnh hiện có, một batch đầy đủ là 15 run. Decoding là gree
 
 ## Một run làm gì
 
-Ảnh được pad thành hình vuông rồi resize về 336×336, thành 576 image token trên lưới 24×24. Model load một lần với attention `eager` (bắt buộc để lấy trọng số attention; demo Gradio phải tắt trước vì 13B fp16 chiếm khoảng 27GB).
+Ảnh được pad thành hình vuông rồi resize về 336×336, thành 576 image token trên lưới 24×24. Model load một lần với attention `eager` (bắt buộc để lấy trọng số attention). `run_exp1.sh` tự tắt demo Gradio trước khi load, vì 13B fp16 chiếm khoảng 27GB. Sau thí nghiệm, bật lại demo bằng `bash runpod/start_gradio.sh --detach`.
 
 Với mỗi ảnh, script chạy trước một lượt prompt chung `"Write a general description of the image."` và giữ attention của token input cuối. Lượt này dùng chung cho cả 3 prompt của ảnh đó.
 
