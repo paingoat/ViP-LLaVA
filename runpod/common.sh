@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Shared helpers for setup_runpod.sh and runpod/start_demo.sh. Source it, don't execute it.
+# Shared helpers for setup_runpod.sh and runpod/start_gradio.sh. Source it, don't execute it.
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 

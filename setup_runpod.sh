@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
-# One-shot ViP-LLaVA setup on RunPod: Miniconda -> conda env + libs -> HF weights (hf_transfer) -> Gradio demo.
-# Usage: bash setup_runpod.sh [--skip-install] [--skip-download] [--no-launch]
+# One-shot ViP-LLaVA setup on RunPod: Miniconda -> conda env + libs -> HF weights (hf_transfer).
+# Usage: bash setup_runpod.sh [--skip-install] [--skip-download]
 set -eo pipefail
 
 SKIP_INSTALL=0
 SKIP_DOWNLOAD=0
-LAUNCH=1
 for arg in "$@"; do
     case "$arg" in
         --skip-install) SKIP_INSTALL=1 ;;
         --skip-download) SKIP_DOWNLOAD=1 ;;
-        --no-launch) LAUNCH=0 ;;
         -h|--help) sed -n '2,3p' "$0"; exit 0 ;;
         *) echo "Unknown option: $arg" >&2; exit 1 ;;
     esac
@@ -91,9 +89,4 @@ if [[ $SKIP_DOWNLOAD -eq 0 ]]; then
     python runpod/download_weights.py
 fi
 
-# ---------- 5. Demo ----------
-if [[ $LAUNCH -eq 1 ]]; then
-    bash runpod/start_demo.sh
-else
-    log "Setup done. Start the demo with: bash runpod/start_demo.sh"
-fi
+log "Setup done. Start the demo with: bash runpod/start_gradio.sh"
