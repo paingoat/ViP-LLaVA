@@ -50,6 +50,8 @@ bash runpod/start_gradio.sh logs       # xem log của server đang chạy (Ctrl
 bash runpod/start_gradio.sh stop       # dừng
 ```
 
+`start_gradio.sh` tự nạp Miniconda và kích hoạt env `vip-llava`. Terminal mới không cần `conda activate` trước khi chạy script.
+
 ## 4. Cấu hình `.env`
 
 | Biến | Ý nghĩa |
@@ -74,6 +76,9 @@ bash runpod/start_gradio.sh stop       # dừng
 | Không thấy public link | `grep gradio.live /workspace/data/logs/gradio.out`; hoặc dùng `https://<POD_ID>-7860.proxy.runpod.net` (cần expose port 7860) |
 | Dropdown không có model | Reload trang; xem `/workspace/data/logs/worker_*.out` |
 | Hết VRAM | Đặt `LOAD_MODE=8bit` hoặc bớt model trong `MODEL_PATHS` |
+| `conda: command not found` | Script demo tự nạp conda. Để gọi `conda` trực tiếp: `source /workspace/miniconda3/etc/profile.d/conda.sh && conda activate vip-llava` |
+| Worker dừng, log có `pkg_resources` hoặc `protobuf` | Trong env `vip-llava`: `pip install -r runpod/requirements.txt`, rồi chạy lại `bash runpod/start_gradio.sh` |
+| Log worker có `flash-attention` package not found | Model vẫn chạy. Đây là cảnh báo thiếu thư viện tăng tốc, chỉ cần khi train |
 | Lỗi khi cài lại thư viện | `conda env remove -n vip-llava` rồi chạy lại `bash setup_runpod.sh` |
 
 ## 7. Ghi chú về phiên bản thư viện
@@ -81,5 +86,7 @@ bash runpod/start_gradio.sh stop       # dừng
 - `gradio==3.35.2` (không phải 4.16.0 như trong `pyproject.toml` gốc): `llava/serve/gradio_web_server.py` dùng API của Gradio 3.x (`gr.Button.update`, `tool="color-sketch"`, `concurrency_count`). Vì vậy phải pin kèm `pydantic<2`, `fastapi==0.104.1`, `websockets==11.0.3`.
 - `numpy==1.26.4`: torch 2.1.2 và scikit-learn 1.2.2 không chạy được với NumPy 2.
 - `huggingface_hub==0.25.2`: transformers 4.37.2 yêu cầu `<1.0`; phiên bản này tải qua `hf_transfer` khi `HF_HUB_ENABLE_HF_TRANSFER=1`.
+- `setuptools<81`: Gradio 3.35.2 import `pkg_resources`. Từ setuptools 81 module này không còn.
+- `protobuf==4.25.3`: `LlamaTokenizer` của transformers 4.37.2 cần protobuf để đọc file tokenizer.
 - Demo Gradio chỉ hỗ trợ các checkpoint dùng Vicuna (`vip-llava-7b`, `vip-llava-13b`, `*-base`). Các bản Llama-3/Phi-3 cần template hội thoại khác.
 - Không cài `flash-attn`/`deepspeed` vì chỉ cần cho training.
