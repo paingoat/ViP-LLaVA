@@ -17,7 +17,7 @@ IGNORE_PATTERNS = ["*.h5", "*.msgpack", "*.ot", "*.onnx", "*.tflite", "tf_model*
 
 
 def main():
-    repos = sys.argv[1:] or [p.strip() for p in os.environ.get("MODEL_PATHS", "mucai/vip-llava-7b").split(",")]
+    repos = sys.argv[1:] or [p.strip() for p in os.environ.get("MODEL_PATHS", "mucai/vip-llava-13b").split(",")]
     repos = [r for r in repos if r and not os.path.isdir(r)]
     repos.append(VISION_TOWER)
 

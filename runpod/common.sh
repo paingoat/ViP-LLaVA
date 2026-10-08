@@ -23,7 +23,7 @@ load_env() {
     : "${CONDA_DIR:=/workspace/miniconda3}"
     : "${CONDA_ENV_NAME:=vip-llava}"
     : "${PYTHON_VERSION:=3.10}"
-    : "${MODEL_PATHS:=mucai/vip-llava-7b}"
+    : "${MODEL_PATHS:=mucai/vip-llava-13b}"
     : "${LOAD_MODE:=fp16}"
     : "${CONTROLLER_PORT:=10000}"
     : "${WORKER_BASE_PORT:=40000}"

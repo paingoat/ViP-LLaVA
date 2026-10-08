@@ -6,7 +6,7 @@
 | --- | --- |
 | Template | RunPod PyTorch (CUDA 12.8) — bất kỳ image Ubuntu có driver ≥ 12.1 đều chạy được |
 | GPU | 1× RTX A6000 (48GB) |
-| Volume disk (`/workspace`) | ≥ 60GB cho 7B, ≥ 90GB nếu chạy thêm 13B |
+| Volume disk (`/workspace`) | ≥ 90GB cho 13B |
 | Container disk | ≥ 20GB |
 | Expose HTTP port | `7860` (tuỳ chọn, để dùng link RunPod proxy) |
 
@@ -28,7 +28,7 @@ bash setup_runpod.sh
 
 1. Cài Miniconda vào `/workspace/miniconda3`.
 2. Tạo env `vip-llava` (Python 3.10), cài PyTorch 2.1.2 (cu121) và các thư viện đã pin trong `runpod/requirements.txt`, rồi `pip install -e .`.
-3. Tạo `/workspace/data/{huggingface,logs}` và tải trọng số bằng `hf_transfer` vào `/workspace/data/huggingface`: `mucai/vip-llava-7b` (~13.5GB) và `openai/clip-vit-large-patch14-336` (~1.7GB).
+3. Tạo `/workspace/data/{huggingface,logs}` và tải trọng số bằng `hf_transfer` vào `/workspace/data/huggingface`: `mucai/vip-llava-13b` (~26GB) và `openai/clip-vit-large-patch14-336` (~1.7GB).
 4. Khởi động controller, model worker và Gradio, rồi in ra **Public link** (`https://xxxx.gradio.live`).
 
 Các tuỳ chọn: `--skip-install`, `--skip-download`, `--no-launch`.
