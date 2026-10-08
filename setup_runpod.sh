@@ -55,6 +55,10 @@ if [[ $SKIP_INSTALL -eq 0 ]]; then
     fi
     conda activate "$CONDA_ENV_NAME"
 
+    # Auto-activate the env in new terminals (~/.bashrc lives on the container disk, re-added each setup).
+    activate_line="source $CONDA_DIR/etc/profile.d/conda.sh && conda activate $CONDA_ENV_NAME"
+    grep -qxF "$activate_line" ~/.bashrc 2>/dev/null || echo "$activate_line" >> ~/.bashrc
+
     # ---------- 3. Python packages ----------
     log "Installing PyTorch 2.1.2 (cu121 wheels run on the CUDA 12.8 driver)"
     python -m pip install --upgrade pip
@@ -69,6 +73,7 @@ if [[ $SKIP_INSTALL -eq 0 ]]; then
     log "Sanity check"
     python - <<'PY'
 import torch, transformers, gradio, numpy
+import google.protobuf  # noqa: F401
 # llava/model/__init__.py silently swallows import errors, so import the class directly.
 from llava.model.language_model.llava_llama import LlavaLlamaForCausalLM  # noqa: F401
 print(f"torch {torch.__version__} (CUDA {torch.version.cuda}) | transformers {transformers.__version__} "
@@ -76,10 +81,6 @@ print(f"torch {torch.__version__} (CUDA {torch.version.cuda}) | transformers {tr
 assert torch.cuda.is_available(), "CUDA is not available to PyTorch"
 print("GPU:", torch.cuda.get_device_name(0))
 PY
-
-    # Auto-activate the env in new terminals (~/.bashrc lives on the container disk, re-added each setup).
-    activate_line="source $CONDA_DIR/etc/profile.d/conda.sh && conda activate $CONDA_ENV_NAME"
-    grep -qxF "$activate_line" ~/.bashrc 2>/dev/null || echo "$activate_line" >> ~/.bashrc
 else
     activate_conda
 fi
