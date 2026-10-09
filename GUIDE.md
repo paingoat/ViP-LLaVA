@@ -93,14 +93,12 @@ Cách chạy (toàn bộ trên pod):
 # Trên pod:
 cd /workspace/ViP-LLaVA
 git fetch && git checkout attention
-git config --global user.name "<tên>" && git config --global user.email "<email>"
-# git push cần GitHub Personal Access Token (dùng làm password, hoặc: git config --global credential.helper store)
 
-bash runpod/run_exp1.sh --limit 1 --no-push   # smoke test 1 run, không commit
-bash runpod/run_exp1.sh                       # 15 run (5 ảnh x 3 prompt), commit + push batch folder
+bash runpod/run_exp1.sh --limit 1   # smoke test 1 run
+bash runpod/run_exp1.sh             # 15 run (5 ảnh x 3 prompt)
 ```
 
-Sau đó chạy `git pull` ở máy local để lấy batch folder. Script sẽ tắt demo Gradio để giải phóng VRAM; bật lại bằng `bash runpod/start_gradio.sh --detach`. Các tham số thêm của `test/exp1/run_exp1.py` (truyền qua `run_exp1.sh`): `--layers 10-29`, `--topk-heads 3`, `--candidate-frac 0.2`, `--sink-tau 20`, `--max-new-tokens 512`, `--tz-offset 7`.
+Script không commit hay push. Kết quả nằm trên pod tại `test/exp1/output/<timestamp>/`; tải folder đó về máy local. Script tắt demo Gradio để giải phóng VRAM; bật lại bằng `bash runpod/start_gradio.sh --detach`. Các tham số thêm của `test/exp1/run_exp1.py` (truyền qua `run_exp1.sh`): `--layers 10-29`, `--topk-heads 3`, `--candidate-frac 0.2`, `--sink-tau 20`, `--max-new-tokens 512`, `--tz-offset 7`.
 
 ## 7. Xử lý sự cố
 

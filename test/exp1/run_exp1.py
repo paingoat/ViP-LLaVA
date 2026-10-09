@@ -102,9 +102,23 @@ def encode(prompt, tokenizer, device):
 
 @torch.no_grad()
 def generate_answer(model, tokenizer, input_ids, image_tensor, max_new_tokens):
-    """Greedy decoding; returns the answer token ids without EOS."""
+    """Greedy decoding. Returns answer token ids, without the leading BOS or the EOS.
+
+    LlavaLlamaForCausalLM.generate forwards only inputs_embeds. Transformers 4.37 then
+    records a one-token BOS prefix in the returned ids. skip_special_tokens hides that
+    prefix in the decoded string, but leaving it in the ids inserts a fake token between
+    the prompt and the answer, so the answer-token attention rows are off by one.
+    """
     output_ids = model.generate(input_ids, images=image_tensor, do_sample=False, num_beams=1,
                                 max_new_tokens=max_new_tokens, use_cache=True)[0]
+    if len(output_ids) == 0 or int(output_ids[0]) != tokenizer.bos_token_id:
+        first = int(output_ids[0]) if len(output_ids) else None
+        raise RuntimeError(
+            "generate() did not prefix a single BOS token "
+            f"(first id={first}, bos_token_id={tokenizer.bos_token_id}). "
+            "Refusing to treat that id as an answer token."
+        )
+    output_ids = output_ids[1:]
     eos = (output_ids == tokenizer.eos_token_id).nonzero().flatten()
     return output_ids[:int(eos[0])] if len(eos) else output_ids
 

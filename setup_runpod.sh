@@ -1,4 +1,4 @@
-ra#!/usr/bin/env bash
+#!/usr/bin/env bash
 # One-shot ViP-LLaVA setup on RunPod: Miniconda -> conda env + libs -> HF weights (hf_transfer).
 # Usage: bash setup_runpod.sh [--skip-install] [--skip-download]
 set -eo pipefail
@@ -72,8 +72,12 @@ if [[ $SKIP_INSTALL -eq 0 ]]; then
     python - <<'PY'
 import torch, transformers, gradio, numpy
 import google.protobuf  # noqa: F401
+import matplotlib  # noqa: F401
+import scipy.ndimage  # noqa: F401
 # llava/model/__init__.py silently swallows import errors, so import the class directly.
 from llava.model.language_model.llava_llama import LlavaLlamaForCausalLM  # noqa: F401
+from llava.eval.attention_maps import parse_layer_band
+assert parse_layer_band(None, 40) == list(range(10, 30))
 print(f"torch {torch.__version__} (CUDA {torch.version.cuda}) | transformers {transformers.__version__} "
       f"| gradio {gradio.__version__} | numpy {numpy.__version__}")
 assert torch.cuda.is_available(), "CUDA is not available to PyTorch"

@@ -17,6 +17,8 @@ einops==0.6.1
 einops-exts==0.0.4
 timm==0.6.13
 scikit-learn==1.2.2
+# attention_maps.py uses scipy.ndimage. 1.13.x still supports NumPy 1.26 and Python 3.10.
+scipy==1.13.1
 # torch 2.1.2 and scikit-learn 1.2.2 are built against NumPy 1.x
 numpy==1.26.4
 shortuuid
