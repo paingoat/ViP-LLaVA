@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+ra#!/usr/bin/env bash
 # One-shot ViP-LLaVA setup on RunPod: Miniconda -> conda env + libs -> HF weights (hf_transfer).
 # Usage: bash setup_runpod.sh [--skip-install] [--skip-download]
 set -eo pipefail
